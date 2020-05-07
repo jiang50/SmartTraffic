@@ -1,0 +1,43 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++17",
+                "main.cpp",
+                "car.cpp",
+                "intersection.cpp",
+                "SimulatedCity.cpp",
+                "SmartServer.cpp",
+                "-o",
+                "smart"
+            ],
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "run",
+            "type": "shell",
+            "command": "./smart",
+            "args": [
+                "100",
+                "100000",
+                "100",
+                "local_smart"
+            ],
+            "dependsOn": [
+                "build"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
