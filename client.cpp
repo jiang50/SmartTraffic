@@ -30,7 +30,7 @@ bool Client::connectToServer() {
 
 bool Client::sendCarInfo(std::string &cars) {
  //   connectToServer();
-    char *message = (char*)"carInfo"; 
+    char *message = (char*)"car##"; 
     char *finish = (char*)"Done";
     if( (numbytes = send(sockfd, message, strlen(message),0))== -1) {
         perror("send");
@@ -49,7 +49,7 @@ bool Client::sendCarInfo(std::string &cars) {
 string Client::getTrafficLights() {
     string res;
  //   connectToServer();
-    char *light = (char*)"trafficLights"; 
+    char *light = (char*)"light"; 
     if(send(sockfd, light, strlen(light), 0) == -1) {
         perror("send");
     }
@@ -61,7 +61,7 @@ string Client::getTrafficLights() {
             exit(1);
         }
 
-        if (strstr(str, "DONE")!=NULL) break;
+        if (strstr(str, "Done")!=NULL) break;
         string newstr(str);
         rcv += newstr;
     }

@@ -9,7 +9,7 @@ int main(int argc, char** argv) {
     arg1 : mapsize
     arg2 : num of cars
     arg3 : len of route of cars
-    arg4 : mode (local_regular, local_smart, cloud_smart, remotesmart)
+    arg4 : mode (local_regular, local_smart, cloud_smart, remote_smart)
     */
 
    if (argc != 5) {
@@ -23,17 +23,19 @@ int main(int argc, char** argv) {
    SimulatedCity* sc;
    if (mode == "local_regular") {
        sc = new SimulatedCityLocalRegular(mapSize, numCars, len, 20);
-       sc->run();
    }
    else if (mode == "local_smart") {
        sc = new SimulatedCityLocalSmart(mapSize, numCars, len, 20);
-       sc->run();
    }
+   else if (mode == "remote_smart") {
+       sc = new SimulatedCityRemote(mapSize, numCars, len, 20, 10000);
+   }
+
    else {
        cout << "Invalid mode!" << endl;
    }
 
-//    sc->run();
+    sc->run();
     // Car c1(0, 10, 10);
     // c1.displayRoute();
     // c1.update(true);

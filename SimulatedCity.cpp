@@ -57,7 +57,7 @@ void SimulatedCity::asychronizedRun() {
         this_thread::sleep_for (chrono::seconds(3));
         
         curTime += 3;
-        getTrafficLights();
+//        getTrafficLights();
         thread getLight(&SimulatedCity::getTrafficLights, this);
         this_thread::sleep_for (chrono::seconds(2));
         carInfo.join();
@@ -67,6 +67,8 @@ void SimulatedCity::asychronizedRun() {
         updateTrafficLights();
         printCurState();
     }
+
+    getFinalStat();
     printFinishInfo();
 }
 
@@ -77,7 +79,7 @@ void SimulatedCity::getFinalStat() {
         totalTime += cars[i].getTotalTime();
         totalWait += cars[i].getWaitTime();
     }
- //   cout << totalTime << " " << totalWait << endl;
+    cout << totalTime << " " << totalWait << endl;
     avgTime = totalTime / cars.size();
     avgWait = totalWait / cars.size();
     percentWait = (double)totalWait / totalTime;
@@ -279,10 +281,13 @@ bool SimulatedCityRemote::sendCarInfo() {
     Client *c = new Client(53044, host);
     string message;
     for (int i = 0 ; i < cars.size() ; i++) {
+    //    cout << cars[i].getId() << endl;
         message += cars[i].serialize();
     }
+ //   cout << message << endl;
     c->connectToServer();
     c->sendCarInfo(message);
+    cout << "finish sending car info" << endl;
     return true;
 
 }
@@ -314,7 +319,11 @@ void SimulatedCityRemote::updateCarInfo() {
 bool SimulatedCityRemote::getTrafficLights() {
     char *host = (char*)"localhost";
     Client *c = new Client(53044, host);
+    cout << "get traffic lights...";
+    c->connectToServer();
+    cout << "connected!" << endl;
     string tl = c->getTrafficLights();
+ //   cout << tl << endl;
     istringstream iss(tl);
     int light;
     for (int i = 0 ; i < mapSize ; i++) {

@@ -6,8 +6,8 @@
 #include "car.h"
 using namespace std;
 
-Car::Car(int id, int len, int mapsize) {
-    id = id;
+Car::Car(int _id, int len, int mapsize) {
+    id = _id;
     mapSize = mapsize;
     curTime = 0;
     int x,y;

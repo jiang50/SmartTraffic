@@ -26,10 +26,10 @@
             "type": "shell",
             "command": "./smart",
             "args": [
+                "10",
                 "100",
-                "100000",
-                "100",
-                "local_smart"
+                "10",
+                "remote_smart"
             ],
             "dependsOn": [
                 "build"

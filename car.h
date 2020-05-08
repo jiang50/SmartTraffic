@@ -10,7 +10,7 @@ enum State {RUNNING, STOP};
 
 class Car {
     public:
-    Car(int id, int len, int mapsize);
+    Car(int _id, int len, int mapsize);
     void update(bool light);
     std::string generateMessage();
     void displayRoute();
@@ -20,6 +20,7 @@ class Car {
     int getTotalTime();
     int getDir();
     int getNextx();
+    int getId() {return id;}
     int getNexty();
     int getState();
     int getTime();
