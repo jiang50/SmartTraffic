@@ -106,7 +106,7 @@ void SimulatedCity::initializeLights(int ml) {
     for (int i = 0 ; i < mapSize ; i++) {
         for (int j = 0 ; j < mapSize ; j++) {
             trafficLights[i].push_back(Intersection(i, j, ml));
-            updatedLights[i].push_back(-1); //placeholder
+            updatedLights[i].push_back(2); //placeholder
         }
     }
     cout << "Finish generating map" << endl;
@@ -269,7 +269,7 @@ SimulatedCityRemote::SimulatedCityRemote(int mapsize, int numcars, int l, int ml
     waittingCars = 0;
     curTime = 0;
     batch = bz;
-    updatedLights = vector<vector<int>>(mapSize, vector<int>(mapSize, -1));
+    updatedLights = vector<vector<int>>(mapSize, vector<int>(mapSize, 2));
     initializeLights(ml);
     initializeCars();
 }
@@ -313,7 +313,7 @@ void SimulatedCityRemote::updateCarInfo() {
 
 bool SimulatedCityRemote::getTrafficLights() {
     char *host = (char*)"localhost";
-    Client *c = new Client(53045, host);
+    Client *c = new Client(53044, host);
     string tl = c->getTrafficLights();
     istringstream iss(tl);
     int light;

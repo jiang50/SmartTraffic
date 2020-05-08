@@ -39,6 +39,36 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "build2",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++17",
+                "runserver.cpp",
+                "server.cpp",
+                "SmartServer.cpp",
+                "-o",
+                "server"
+            ],
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "run2",
+            "type": "shell",
+            "command": "./server",
+            "args": [],
+            "dependsOn": [
+                "build2"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
+
     ]
 }

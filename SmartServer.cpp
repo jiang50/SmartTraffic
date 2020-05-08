@@ -53,7 +53,7 @@ vector<vector<int>> SmartServer::getTtrafficLights() {
                 res[i][j] = cache[loc];
             }
             else {
-                res[i][j] = -1;
+                res[i][j] = 2;
             }
         }
     }

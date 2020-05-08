@@ -30,7 +30,15 @@ bool Client::connectToServer() {
 
 bool Client::sendCarInfo(std::string &cars) {
  //   connectToServer();
+    char *message = (char*)"carInfo"; 
+    char *finish = (char*)"Done";
+    if( (numbytes = send(sockfd, message, strlen(message),0))== -1) {
+        perror("send");
+    }
     if( (numbytes = send(sockfd, cars.c_str(), cars.length(),0))== -1) {
+        perror("send");
+    }
+    if( (numbytes = send(sockfd, finish, strlen(finish),0))== -1) {
         perror("send");
     }
     close(sockfd);

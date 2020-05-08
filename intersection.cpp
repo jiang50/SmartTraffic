@@ -34,7 +34,7 @@ void Intersection::checkAndSwitch() {
 }
 
 void Intersection::update(int lightFromCloud) {
-    if (lightFromCloud == -1) {
+    if (lightFromCloud == 2) {
         checkAndSwitch();
     }
     if (light == lightFromCloud) {
