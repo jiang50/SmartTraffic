@@ -25,21 +25,23 @@ bool Client::connectToServer() {
 		perror("connect");
 		exit(1);
 	}
+    return true;
 }
 
 bool Client::sendCarInfo(std::string &cars) {
-    connectToServer();
+ //   connectToServer();
     if( (numbytes = send(sockfd, cars.c_str(), cars.length(),0))== -1) {
         perror("send");
     }
+    close(sockfd);
     return true;
 
 }
 
 string Client::getTrafficLights() {
     string res;
-    connectToServer();
-    char *light = "trafficLights"; 
+ //   connectToServer();
+    char *light = (char*)"trafficLights"; 
     if(send(sockfd, light, strlen(light), 0) == -1) {
         perror("send");
     }
@@ -55,5 +57,6 @@ string Client::getTrafficLights() {
         string newstr(str);
         rcv += newstr;
     }
+    close(sockfd);
     return rcv;
 }

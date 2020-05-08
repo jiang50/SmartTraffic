@@ -180,3 +180,24 @@ int Car::getState() {
         return 2;
     }
 }
+
+string Car::serialize() {
+    string res;
+    res += to_string(id);
+    res += " ";
+    res += to_string(dir);
+    res += " ";
+    int tl = mapSize * getNextx() + getNexty();
+    res += to_string(tl);
+    res += " ";
+    res += to_string(curTime);
+    res += " ";
+    if (arrived) {
+        res += '1';
+    }
+    else {
+        res += '0';
+    }
+    res += '\n';
+    return res;
+}

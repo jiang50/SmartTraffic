@@ -3,7 +3,7 @@
 #include <iostream>
 #include <thread>         // std::this_thread::sleep_for
 #include <chrono>         // std::chrono::seconds
- 
+#include <sstream>
 using namespace std;
 
 /*
@@ -49,17 +49,22 @@ light                          getLight. . . . . updateLight                getL
 
 void SimulatedCity::asychronizedRun() {
     printCurState();
-    sendCarInfo();
+    
 
     while (finishedCars < numCars) {
+    //    sendCarInfo();
+        thread carInfo(&SimulatedCity::sendCarInfo, this);
         this_thread::sleep_for (chrono::seconds(3));
+        
         curTime += 3;
         getTrafficLights();
+        thread getLight(&SimulatedCity::getTrafficLights, this);
         this_thread::sleep_for (chrono::seconds(2));
+        carInfo.join();
+        getLight.join();
         curTime += 2;
         updateCarInfo();
         updateTrafficLights();
-        sendCarInfo();
         printCurState();
     }
     printFinishInfo();
@@ -247,4 +252,90 @@ void SimulatedCityLocalSmart::updateTrafficLights() {
 
 void SimulatedCityLocalSmart::run() {
     sychronizedRun();
+}
+
+/*
+###################################
+########## remote ################
+#################################
+*/
+
+SimulatedCityRemote::SimulatedCityRemote(int mapsize, int numcars, int l, int ml, int bz) {
+    mapSize = mapsize;
+    numCars = numcars;
+    len = l;
+    finishedCars = 0;
+    runningCars = numCars;
+    waittingCars = 0;
+    curTime = 0;
+    batch = bz;
+    updatedLights = vector<vector<int>>(mapSize, vector<int>(mapSize, -1));
+    initializeLights(ml);
+    initializeCars();
+}
+
+bool SimulatedCityRemote::sendCarInfo() {
+    char *host = (char*)"localhost";
+    Client *c = new Client(53044, host);
+    string message;
+    for (int i = 0 ; i < cars.size() ; i++) {
+        message += cars[i].serialize();
+    }
+    c->connectToServer();
+    c->sendCarInfo(message);
+    return true;
+
+}
+
+void SimulatedCityRemote::updateCarInfo() {
+    int x,y;
+    int state;
+    finishedCars = 0;
+    runningCars = 0;
+    waittingCars = 0;
+    for (int i = 0 ; i < cars.size() ; i++) {
+        x = cars[i].getNextx();
+        y = cars[i].getNexty();
+        cars[i].update(trafficLights[x][y].getLight());
+        state = cars[i].getState();
+        if (state == 0) {
+            finishedCars++;
+        }
+        else if (state == 1) {
+            runningCars++;
+        }
+        else {
+            waittingCars++;
+        }
+
+    }
+}
+
+bool SimulatedCityRemote::getTrafficLights() {
+    char *host = (char*)"localhost";
+    Client *c = new Client(53045, host);
+    string tl = c->getTrafficLights();
+    istringstream iss(tl);
+    int light;
+    for (int i = 0 ; i < mapSize ; i++) {
+        for (int j = 0 ; j < mapSize ; j++) {
+            iss >> light;
+            updatedLights[i][j] = light;
+        }
+    }
+    return true;
+
+}
+
+void SimulatedCityRemote::updateTrafficLights() {
+    for (int i = 0 ; i < mapSize ; i++) {
+        for (int j = 0 ; j < mapSize ; j++) {
+            trafficLights[i][j].update(updatedLights[i][j]);
+        }
+    }
+}
+
+void SimulatedCityRemote::run() {
+    asychronizedRun();
+
 }

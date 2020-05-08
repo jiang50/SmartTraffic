@@ -1,6 +1,8 @@
 #include "car.h"
 #include "intersection.h"
 #include "SmartServer.h"
+#include "client.h"
+#include <thread> 
 
 
 /*
@@ -75,12 +77,24 @@ class SimulatedCityLocalSmart : public SimulatedCity {
     SmartServer *smartServer;
 };
 
-/*
+
 
 class SimulatedCityRemote : public SimulatedCity {
+    public:
+    SimulatedCityRemote(int mapsize, int numcars, int l, int ml, int bz);
+
+    bool sendCarInfo();
+    void updateCarInfo();
+    bool getTrafficLights();
+    void updateTrafficLights();
+    void run();
+
+    private:
+    int batch;
 
 };
 
+/*
 class SimulatedCityCloud : public SimulatedCity {
 
 };

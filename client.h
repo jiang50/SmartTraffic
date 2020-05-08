@@ -9,6 +9,7 @@
 #include<sys/wait.h>
 #include<netdb.h>
 #include<arpa/inet.h>
+#include <unistd.h>
 
 class Client {
     public:
