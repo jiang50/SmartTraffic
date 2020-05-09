@@ -52,13 +52,13 @@ void Server::runServer() {
             string mess;
             for (int i = 0 ; i < mapSize ; i++) {
                 for (int j = 0 ; j < mapSize ; j++) {
-                //    cout << traffcLight[i][j];
+                    cout << traffcLight[i][j];
                     mess += to_string(traffcLight[i][j]);
                     mess += " ";
                 }
-             //   cout << endl;
+                cout << endl;
             }
-        //    cout << endl;
+            cout << endl;
             if( (valread = send(new_fd, mess.c_str(), mess.length(),0))== -1) {
                 perror("send");
             }
@@ -69,6 +69,7 @@ void Server::runServer() {
         }
         else if (strstr(buffer, "car##")!=NULL) {
             string carInfo;
+            bool printfirst = true;
             while (1) {
                 if ((valread=recv(new_fd, buffer, 1024, 0)) == -1) {
                     perror("recv");
@@ -76,7 +77,22 @@ void Server::runServer() {
                 }
                 
                 string newstr(buffer);
-             //   cout << newstr << endl;
+
+                if (printfirst) {
+                    cout << newstr << endl;
+                    printfirst = false;
+                }
+
+                string iphead = "127."; //weird
+                int p;
+                if ((p = newstr.find(iphead)) != std::string::npos) {
+                    newstr = newstr.substr(0,p);
+                }
+                if (printfirst) {
+                    cout << newstr << endl;
+                }
+                // cout << newstr << endl;
+                // cout << endl;
                 carInfo += newstr;
                 if (strstr(buffer, "Done")!=NULL) break;
                 
@@ -90,7 +106,7 @@ void Server::runServer() {
             carInfo = carInfo.substr(0, pos);
             while ((pos = carInfo.find(delimiter)) != std::string::npos) {
                 token = carInfo.substr(0, pos);
-             //   cout << token << endl;
+            //    cout << token << endl;
                 istringstream iss(token);
                 int id, dir, xy, x, y, time, arrived;
                 bool isarrived = false;

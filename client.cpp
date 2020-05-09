@@ -1,4 +1,5 @@
 #include "client.h"
+#include <iostream>
 
 using namespace std;
 
@@ -32,6 +33,7 @@ bool Client::sendCarInfo(std::string &cars) {
  //   connectToServer();
     char *message = (char*)"car##"; 
     char *finish = (char*)"Done";
+//    cout << cars;
     if( (numbytes = send(sockfd, message, strlen(message),0))== -1) {
         perror("send");
     }

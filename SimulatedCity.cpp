@@ -79,7 +79,7 @@ void SimulatedCity::getFinalStat() {
         totalTime += cars[i].getTotalTime();
         totalWait += cars[i].getWaitTime();
     }
-    cout << totalTime << " " << totalWait << endl;
+ //   cout << totalTime << " " << totalWait << endl;
     avgTime = totalTime / cars.size();
     avgWait = totalWait / cars.size();
     percentWait = (double)totalWait / totalTime;
