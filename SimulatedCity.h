@@ -94,9 +94,19 @@ class SimulatedCityRemote : public SimulatedCity {
 
 };
 
-/*
-class SimulatedCityCloud : public SimulatedCity {
 
+class SimulatedCityCloud : public SimulatedCity {
+    public:
+    SimulatedCityCloud(int mapsize, int numcars, int l, int ml, string h);
+
+    bool sendCarInfo();
+    void updateCarInfo();
+    bool getTrafficLights();
+    void updateTrafficLights();
+    void run();
+
+    private:
+    string host;
+    
 };
 
-*/

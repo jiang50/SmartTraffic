@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Client::Client(int port, char *host) {
+Client::Client(int port, const char *host) {
     struct hostent *he;
     if ((he=gethostbyname(host)) == NULL) {
 		herror("gethostbyname");
@@ -31,18 +31,29 @@ bool Client::connectToServer() {
 
 bool Client::sendCarInfo(std::string &cars) {
  //   connectToServer();
-    char *message = (char*)"car##"; 
-    char *finish = (char*)"Done";
+    // char *message = (char*)"car##"; 
+    // char *finish = (char*)"Done";
 //    cout << cars;
-    if( (numbytes = send(sockfd, message, strlen(message),0))== -1) {
-        perror("send");
-    }
+    // if( (numbytes = send(sockfd, message, strlen(message),0))== -1) {
+    //     perror("send");
+    // }
     if( (numbytes = send(sockfd, cars.c_str(), cars.length(),0))== -1) {
         perror("send");
     }
-    if( (numbytes = send(sockfd, finish, strlen(finish),0))== -1) {
-        perror("send");
+    // if( (numbytes = send(sockfd, finish, strlen(finish),0))== -1) {
+    //     perror("send");
+    // }
+    string rcv;   
+   
+    if ((numbytes=recv(sockfd, str, 1000, 0)) == -1) {
+        perror("recv");
+        exit(1);
     }
+
+    printf("%s", str);
+    // string newstr(str);
+    // rcv += newstr;
+    
     close(sockfd);
     return true;
 
@@ -51,8 +62,9 @@ bool Client::sendCarInfo(std::string &cars) {
 string Client::getTrafficLights() {
     string res;
  //   connectToServer();
-    char *light = (char*)"light"; 
-    if(send(sockfd, light, strlen(light), 0) == -1) {
+  //  char *light = (char*)"light"; 
+    char *message = (char*)"GET /api/getLight HTTP/1.1\r\nHost: smart-traffic-node.azurewebsites.net\r\n\r\n";
+    if(send(sockfd, message, strlen(message), 0) == -1) {
         perror("send");
     }
     

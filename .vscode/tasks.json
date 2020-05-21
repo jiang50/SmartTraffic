@@ -16,7 +16,7 @@
                 "SmartServer.cpp",
                 "client.cpp",
                 "-o",
-                "smart"
+                "smart1"
             ],
             "problemMatcher": [],
             "group": "build"
@@ -24,7 +24,7 @@
         {
             "label": "run",
             "type": "shell",
-            "command": "./smart",
+            "command": "./smart1",
             "args": [
                 "100",
                 "100000",

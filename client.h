@@ -13,7 +13,7 @@
 
 class Client {
     public:
-    Client(int port, char *host);
+    Client(int port, const char *host);
     bool connectToServer();
     bool sendCarInfo(std::string &cars);
     std::string getTrafficLights();

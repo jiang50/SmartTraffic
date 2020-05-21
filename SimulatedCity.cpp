@@ -348,3 +348,110 @@ void SimulatedCityRemote::run() {
     asychronizedRun();
 
 }
+
+/*
+########################################
+############# Cloud ###################
+#######################################
+*/
+
+SimulatedCityCloud::SimulatedCityCloud(int mapsize, int numcars, int l, int ml, string h) {
+    mapSize = mapsize;
+    numCars = numcars;
+    len = l;
+    finishedCars = 0;
+    runningCars = numCars;
+    waittingCars = 0;
+    curTime = 0;
+    host = h;
+    updatedLights = vector<vector<int>>(mapSize, vector<int>(mapSize, 2));
+    initializeLights(ml);
+    initializeCars();
+}
+
+bool SimulatedCityCloud::sendCarInfo() {
+    const char *h = host.c_str();
+    Client *c = new Client(80, h);
+    string message;
+    string header = "POST /api/car_info HTTP/1.1\r\nHost: smart-traffic-node.azurewebsites.net\r\nContent-Type: text/plain\r\nContent-Length: ";
+    for (int i = 0 ; i < cars.size() ; i++) {
+    //    cout << cars[i].getId() << endl;
+        message += cars[i].serialize();
+    }
+    header += to_string(message.size());
+    header += "\r\n\r\n";
+    message = header + message;
+ //   cout << message << endl;
+    c->connectToServer();
+    c->sendCarInfo(message);
+    cout << "finish sending car info" << endl;
+    return true;
+}
+
+void SimulatedCityCloud::updateCarInfo() {
+    int x,y;
+    int state;
+    finishedCars = 0;
+    runningCars = 0;
+    waittingCars = 0;
+    for (int i = 0 ; i < cars.size() ; i++) {
+        x = cars[i].getNextx();
+        y = cars[i].getNexty();
+        cars[i].update(trafficLights[x][y].getLight());
+        state = cars[i].getState();
+        if (state == 0) {
+            finishedCars++;
+        }
+        else if (state == 1) {
+            runningCars++;
+        }
+        else {
+            waittingCars++;
+        }
+
+    }
+}
+
+bool SimulatedCityCloud::getTrafficLights() {
+    const char *h = host.c_str();
+    Client *c = new Client(80, h);
+    cout << "get traffic lights...";
+    c->connectToServer();
+    cout << "connected!" << endl;
+    string tl = c->getTrafficLights();
+    cout << tl << endl;
+    string delimiter = "lights:";
+    size_t pos = 0;
+
+    pos = tl.find(delimiter);
+    tl.erase(0, pos + delimiter.length());
+    istringstream iss(tl);
+    int light;
+    for (int i = 0 ; i < mapSize ; i++) {
+        for (int j = 0 ; j < mapSize ; j++) {
+            iss >> light;
+            updatedLights[i][j] = light;
+        }
+    }
+    return true;
+}
+
+void SimulatedCityCloud::updateTrafficLights() {
+    for (int i = 0 ; i < mapSize ; i++) {
+        for (int j = 0 ; j < mapSize ; j++) {
+        //    trafficLights[i][j].update(updatedLights[i][j]);
+        trafficLights[i][j].checkAndSwitch();
+        }
+    }
+}
+
+void SimulatedCityCloud::run() {
+    sychronizedRun();
+}
+
+
+
+
+
+
+
