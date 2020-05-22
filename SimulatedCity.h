@@ -3,7 +3,7 @@
 #include "SmartServer.h"
 #include "client.h"
 #include <thread> 
-
+#include <fstream>
 
 /*
 put car and intersection initialization outside class
@@ -21,7 +21,7 @@ class SimulatedCity {
     void sychronizedRun();
     void asychronizedRun();
     
-    void printCurState();
+    void printCurState(std::ofstream& myfile);
     void printFinishInfo();
     void getFinalStat();
 
@@ -36,7 +36,7 @@ class SimulatedCity {
     int waittingCars;
     int len;
     int curTime;
-
+    int justArrived;
     int avgTime;
     int avgWait;
     double percentWait;
@@ -97,7 +97,7 @@ class SimulatedCityRemote : public SimulatedCity {
 
 class SimulatedCityCloud : public SimulatedCity {
     public:
-    SimulatedCityCloud(int mapsize, int numcars, int l, int ml, string h);
+    SimulatedCityCloud(int mapsize, int numcars, int l, int ml, std::string h);
 
     bool sendCarInfo();
     void updateCarInfo();
@@ -106,7 +106,7 @@ class SimulatedCityCloud : public SimulatedCity {
     void run();
 
     private:
-    string host;
+    std::string host;
     
 };
 

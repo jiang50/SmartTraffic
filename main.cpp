@@ -20,6 +20,7 @@ int main(int argc, char** argv) {
    int numCars = stoi(argv[2]);
    int len = stoi(argv[3]);
    string mode = argv[4];
+   string host = "smart-traffic-node.azurewebsites.net";
    SimulatedCity* sc;
    if (mode == "local_regular") {
        sc = new SimulatedCityLocalRegular(mapSize, numCars, len, 20);
@@ -29,6 +30,9 @@ int main(int argc, char** argv) {
    }
    else if (mode == "remote_smart") {
        sc = new SimulatedCityRemote(mapSize, numCars, len, 20, 10000);
+   }
+   else if (mode == "cloud_smart") {
+       sc = new SimulatedCityCloud(mapSize, numCars, len, 20, host);
    }
 
    else {

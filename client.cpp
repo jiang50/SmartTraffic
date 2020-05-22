@@ -37,6 +37,7 @@ bool Client::sendCarInfo(std::string &cars) {
     // if( (numbytes = send(sockfd, message, strlen(message),0))== -1) {
     //     perror("send");
     // }
+    cout << cars << endl;
     if( (numbytes = send(sockfd, cars.c_str(), cars.length(),0))== -1) {
         perror("send");
     }
@@ -74,11 +75,15 @@ string Client::getTrafficLights() {
             perror("recv");
             exit(1);
         }
-
-        if (strstr(str, "Done")!=NULL) break;
         string newstr(str);
         rcv += newstr;
+        if (strstr(str, "Done")!=NULL) break;
+        
     }
+    size_t pos = 0;
+    pos = rcv.find("Done");
+    rcv = rcv.substr(0, pos);
+  //  cout << "received lights: " << rcv << endl;
     close(sockfd);
     return rcv;
 }

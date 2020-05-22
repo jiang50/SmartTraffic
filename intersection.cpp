@@ -25,6 +25,7 @@ Intersection::Intersection(int x, int y, int ml) : locx(x), locy(y), maxlen(ml) 
 }
 
 void Intersection::checkAndSwitch() {
+    
     lenOfCurLight += 5;
     if (lenOfCurLight == maxlen) {
         light = !light;
@@ -35,9 +36,10 @@ void Intersection::checkAndSwitch() {
 
 void Intersection::update(int lightFromCloud) {
     if (lightFromCloud == 2) {
+     //   cout << "cw" << " ";
         checkAndSwitch();
     }
-    if (light == lightFromCloud) {
+    else if (light == lightFromCloud) {
         lenOfCurLight += 5;
     }
     else {

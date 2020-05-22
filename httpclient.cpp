@@ -16,9 +16,9 @@ int main(int argc,char *argv[])
 {
     /* first what are we going to send and where are we going to send it? */
     int portno =        80;
-    char *host =        (char*)"smart-traffic.azurewebsites.net";
- //   char *host = (char*)"smart-traffic-node.azurewebsites.net";
-    char *message = (char*)"GET /api/SmartTraffic_HttpTrigger1?name=shang HTTP/1.1\r\nHost: smart-traffic.azurewebsites.net\r\n\r\n";
+ //   char *host =        (char*)"smart-traffic.azurewebsites.net";
+    char *host = (char*)"smart-traffic-node.azurewebsites.net";//https://smart-traffic-node.azurewebsites.net/api/car_info/{car_id:int?}/{current_edge:alpha}/{route:alpha}/{direction:alpha}
+    char *message = (char*)"GET /api/getLight HTTP/1.1\r\nHost: smart-traffic-node.azurewebsites.net\r\n\r\n";
  //   char *message = (char*)"POST /api/car_info HTTP/1.1\r\nHost: smart-traffic-node.azurewebsites.net\r\nContent-Type: text/plain\r\nContent-Length: 39\r\n\r\n0 1234 2 5 0\n1 3214 1 5 1\n2 4321 0 5 1\n";
  //  char *message = (char*)"GET /api/SmartTraffic_HttpTrigger1?name=shangl HTTP/1.1\r\nHost: smart-traffic.azurewebsites.net\r\nConnection: keep-alive\r\nCache-Control: max-age=0\r\nUpgrade-Insecure-Requests: 1\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nAccept-Encoding: gzip, deflate\r\nAccept-Language: en-US,en;q=0.9,la;q=0.8\r\n\r\n";
 //Host: smart-traffic.azurewebsites.net

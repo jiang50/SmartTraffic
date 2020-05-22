@@ -4,7 +4,11 @@
 #include <thread>         // std::this_thread::sleep_for
 #include <chrono>         // std::chrono::seconds
 #include <sstream>
+#include <algorithm> 
+
+
 using namespace std;
+using namespace std::chrono; 
 
 /*
 Sychronized:
@@ -15,7 +19,10 @@ event  sendCarInfo                     updateCarInfo->get/updateLight->sendcarin
 */
 
 void SimulatedCity::sychronizedRun() {
-    printCurState();
+    std::ofstream myfile;
+    myfile.open("example.csv");
+    myfile << "time,totalArrived,justArrived\n";
+    printCurState(myfile);
     
     if (!sendCarInfo()) {
         cout << "Failed to update car info" << endl;
@@ -27,7 +34,7 @@ void SimulatedCity::sychronizedRun() {
         updateCarInfo();
         getTrafficLights();        
         updateTrafficLights();
-        printCurState();
+        printCurState(myfile);
         if (!sendCarInfo()) {
             cout << "Failed to update car info" << endl;
             return;
@@ -48,9 +55,10 @@ light                          getLight. . . . . updateLight                getL
 */
 
 void SimulatedCity::asychronizedRun() {
-    printCurState();
     
-
+    std::ofstream myfile;
+    myfile.open("example2.csv");
+    printCurState(myfile);
     while (finishedCars < numCars) {
     //    sendCarInfo();
         thread carInfo(&SimulatedCity::sendCarInfo, this);
@@ -65,7 +73,7 @@ void SimulatedCity::asychronizedRun() {
         curTime += 2;
         updateCarInfo();
         updateTrafficLights();
-        printCurState();
+        printCurState(myfile);
     }
 
     getFinalStat();
@@ -94,11 +102,13 @@ void SimulatedCity::printFinishInfo() {
 
 }
 
-void SimulatedCity::printCurState() {
+void SimulatedCity::printCurState(ofstream& myfile) {
     cout << curTime << "s: ";
     cout << waittingCars << " cars are waiting, ";
     cout << runningCars << " cars are running, ";
-    cout << finishedCars << " cars arrived." << endl;
+    cout << finishedCars << " cars arrived.";
+    cout << justArrived << " cars just arrived. " << endl;
+    myfile << to_string(curTime) + "," + to_string(finishedCars) + "," + to_string(justArrived) + "\n";
 }
 
 void SimulatedCity::initializeLights(int ml) {
@@ -148,9 +158,11 @@ bool SimulatedCityLocalRegular::sendCarInfo() {
 void SimulatedCityLocalRegular::updateCarInfo() {
     int x,y;
     int state;
+    int oldFinished = finishedCars;
     finishedCars = 0;
     runningCars = 0;
     waittingCars = 0;
+    
     for (int i = 0 ; i < cars.size() ; i++) {
         x = cars[i].getNextx();
         y = cars[i].getNexty();
@@ -167,6 +179,7 @@ void SimulatedCityLocalRegular::updateCarInfo() {
         }
 
     }
+    justArrived = finishedCars - oldFinished;
 }
 
 
@@ -217,9 +230,11 @@ bool SimulatedCityLocalSmart::sendCarInfo() {
 void SimulatedCityLocalSmart::updateCarInfo() {
     int x,y;
     int state;
+    int oldFinished = finishedCars;
     finishedCars = 0;
     runningCars = 0;
     waittingCars = 0;
+    
     for (int i = 0 ; i < cars.size() ; i++) {
         x = cars[i].getNextx();
         y = cars[i].getNexty();
@@ -236,6 +251,7 @@ void SimulatedCityLocalSmart::updateCarInfo() {
         }
 
     }
+    justArrived = finishedCars - oldFinished;
 
 }
 
@@ -298,6 +314,7 @@ void SimulatedCityRemote::updateCarInfo() {
     finishedCars = 0;
     runningCars = 0;
     waittingCars = 0;
+    justArrived = 0;
     for (int i = 0 ; i < cars.size() ; i++) {
         x = cars[i].getNextx();
         y = cars[i].getNexty();
@@ -305,6 +322,7 @@ void SimulatedCityRemote::updateCarInfo() {
         state = cars[i].getState();
         if (state == 0) {
             finishedCars++;
+            justArrived++;
         }
         else if (state == 1) {
             runningCars++;
@@ -364,16 +382,17 @@ SimulatedCityCloud::SimulatedCityCloud(int mapsize, int numcars, int l, int ml, 
     waittingCars = 0;
     curTime = 0;
     host = h;
-    updatedLights = vector<vector<int>>(mapSize, vector<int>(mapSize, 2));
+   // updatedLights = vector<vector<int>>(mapSize, vector<int>(mapSize, 2));
     initializeLights(ml);
     initializeCars();
 }
 
 bool SimulatedCityCloud::sendCarInfo() {
     const char *h = host.c_str();
+    auto start = high_resolution_clock::now(); 
     Client *c = new Client(80, h);
     string message;
-    string header = "POST /api/car_info HTTP/1.1\r\nHost: smart-traffic-node.azurewebsites.net\r\nContent-Type: text/plain\r\nContent-Length: ";
+    string header = "POST /api/UpdateLocation HTTP/1.1\r\nHost: smart-traffic-node.azurewebsites.net\r\nContent-Type: text/plain\r\nContent-Length: ";
     for (int i = 0 ; i < cars.size() ; i++) {
     //    cout << cars[i].getId() << endl;
         message += cars[i].serialize();
@@ -384,16 +403,22 @@ bool SimulatedCityCloud::sendCarInfo() {
  //   cout << message << endl;
     c->connectToServer();
     c->sendCarInfo(message);
-    cout << "finish sending car info" << endl;
+
+    auto stop = high_resolution_clock::now(); 
+    auto duration = duration_cast<microseconds>(stop - start); 
+  
+    cout << "Send car info take: "<< duration.count() << " microseconds" << endl; 
     return true;
 }
 
 void SimulatedCityCloud::updateCarInfo() {
     int x,y;
     int state;
+    int oldFinished = finishedCars;
     finishedCars = 0;
     runningCars = 0;
     waittingCars = 0;
+    
     for (int i = 0 ; i < cars.size() ; i++) {
         x = cars[i].getNextx();
         y = cars[i].getNexty();
@@ -410,39 +435,53 @@ void SimulatedCityCloud::updateCarInfo() {
         }
 
     }
+    justArrived = finishedCars - oldFinished;
 }
 
 bool SimulatedCityCloud::getTrafficLights() {
     const char *h = host.c_str();
     Client *c = new Client(80, h);
     cout << "get traffic lights...";
+    auto start = high_resolution_clock::now(); 
     c->connectToServer();
     cout << "connected!" << endl;
     string tl = c->getTrafficLights();
-    cout << tl << endl;
+    auto stop = high_resolution_clock::now(); 
     string delimiter = "lights:";
     size_t pos = 0;
 
     pos = tl.find(delimiter);
     tl.erase(0, pos + delimiter.length());
+   // cout << "lights: " << tl << endl;
     istringstream iss(tl);
     int light;
     for (int i = 0 ; i < mapSize ; i++) {
         for (int j = 0 ; j < mapSize ; j++) {
             iss >> light;
+            
             updatedLights[i][j] = light;
         }
     }
+   
+    auto duration = duration_cast<microseconds>(stop - start); 
+  
+    cout << "Get traffic lights take: "<< duration.count() << " microseconds" << endl; 
+  
     return true;
 }
 
 void SimulatedCityCloud::updateTrafficLights() {
     for (int i = 0 ; i < mapSize ; i++) {
         for (int j = 0 ; j < mapSize ; j++) {
-        //    trafficLights[i][j].update(updatedLights[i][j]);
-        trafficLights[i][j].checkAndSwitch();
+           // trafficLights[i][j].update(updatedLights[i][j]);
+          //  cout << updatedLights[i][j] << " " << trafficLights[i][j].getLight() << " ";
+          //  trafficLights[i][j].checkAndSwitch();
+            trafficLights[i][j].update(updatedLights[i][j]);
+            cout << trafficLights[i][j].getLight() << " ";
         }
+        cout << endl;
     }
+    cout << endl;
 }
 
 void SimulatedCityCloud::run() {
